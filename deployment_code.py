@@ -2,9 +2,7 @@
  "cells": [
   {
    "cell_type": "code",
-   git config - -
-global user.name
-"THAVAMANI074"   "id": "ab1a8874-96a3-4b7b-94ce-c443d7b31bf9",
+   "id": "ab1a8874-96a3-4b7b-94ce-c443d7b31bf9",
    "metadata": {},
    "outputs": [],
    "source": [
