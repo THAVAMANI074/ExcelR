@@ -1,9 +1,8 @@
-# File name: app.py
-
 import streamlit as st
 import pandas as pd
 import joblib
 
+# Load model and feature list
 model = joblib.load("logistic_model.pkl")
 features = joblib.load("model_features.pkl")
 
@@ -21,10 +20,12 @@ with st.form("prediction_form"):
     submitted = st.form_submit_button("Predict")
 
 if submitted:
+    # Manual encoding
     Sex = 0 if Sex == 'male' else 1
     Embarked_C = 1 if Embarked == 'C' else 0
     Embarked_Q = 1 if Embarked == 'Q' else 0
 
+    # Create DataFrame with required features
     input_data = pd.DataFrame([{
         'Pclass': Pclass,
         'Sex': Sex,
