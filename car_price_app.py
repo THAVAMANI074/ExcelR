@@ -3,16 +3,21 @@ import pandas as pd
 import numpy as np
 import joblib
 import io
+import os
 
-# ====== PATH TO YOUR TRAINED MODEL ======
-MODEL_PATH = r"C:\Users\Thavamani\Desktop\ExcelR-Project1\best_price_classifier_xgb_10bins.joblib"
+# ====== MODEL CONFIG ======
+# Use relative path to the model folder
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "car_price_predictor", "best_price_classifier_xgb_10bins.joblib")
 
 # ====== Load Model ======
 @st.cache_resource
-def load_model():
-    return joblib.load(MODEL_PATH)
+def load_model(path):
+    if not os.path.exists(path):
+        st.error(f"Model file not found at:\n{path}")
+        st.stop()
+    return joblib.load(path)
 
-model = load_model()
+model = load_model(MODEL_PATH)
 
 # ====== Streamlit UI ======
 st.set_page_config(page_title="Car Price Prediction", page_icon="🚗", layout="centered")
@@ -52,7 +57,7 @@ input_data['log_km'] = np.log1p(input_data['kilometerdriven'])
 input_data['log_age'] = np.log1p(input_data['age'])
 input_data['age_squared'] = input_data['age'] ** 2
 input_data['km_age_interaction'] = input_data['kilometerdriven'] * input_data['age']
-input_data['price_per_km'] = 0  # Placeholder if required
+input_data['price_per_km'] = 0  # Placeholder
 
 # Ensure column order matches model
 input_data = input_data[model.feature_names_in_]
@@ -66,16 +71,13 @@ bins = [
 
 # ====== Prediction ======
 if st.button("Predict Price Category"):
-    # Predict bin
     pred_bin = model.predict(input_data)[0]
-    # Predict probabilities
     pred_probs = model.predict_proba(input_data)[0]
 
-    # Calculate weighted average (midpoint of bin * probability)
+    # Weighted average
     bin_midpoints = np.array([25000, 100000, 200000, 300000, 400000, 525000, 750000, 1050000, 1500000, 2900000])
     estimated_price = np.sum(bin_midpoints * pred_probs)
 
-    # Show results on screen
     st.subheader("✅ Prediction Result")
     st.write(f"**Predicted Bin:** {pred_bin} ({bins[pred_bin]})")
     st.write(f"**Estimated Price (Weighted Average):** ₹{estimated_price:,.2f}")
@@ -104,3 +106,4 @@ if st.button("Predict Price Category"):
         file_name="car_price_prediction.csv",
         mime="text/csv"
     )
+
